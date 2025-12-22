@@ -18,6 +18,13 @@ vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 vim.opt.signcolumn = "yes"
 
+-- Transparent background
+vim.cmd [[
+  hi Normal guibg=NONE ctermbg=NONE
+  hi NormalNC guibg=NONE ctermbg=NONE
+  hi NonText guibg=NONE ctermbg=NONE
+]]
+
 ------------------------------------------------------------
 -- Bootstrap lazy.nvim
 ------------------------------------------------------------
@@ -78,3 +85,19 @@ map("n", "<leader>gsf", builtin.git_status, opts)
 -- GitHub (Octo)
 map("n", "<leader>gi", "<cmd>Octo issue list<CR>", opts)
 map("n", "<leader>gp", "<cmd>Octo pr list<CR>", opts)
+
+------------------------------------------------------------
+-- Auto-make normal files modifiable
+------------------------------------------------------------
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = "*",
+  callback = function()
+    -- Only modifiable if it's a normal file, skip plugin buffers
+    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
+      vim.bo.modifiable = true
+    end
+  end,
+})
+
+-- Optional keybind to toggle modifiable manually
+map("n", "<leader>mm", ":set modifiable<CR>", opts)
