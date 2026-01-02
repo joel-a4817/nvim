@@ -1,52 +1,17 @@
+
+-- Plugin spec for lazy.nvim
 return {
-
-  -- Required
-  { "nvim-lua/plenary.nvim" },
-
-  -- ===============================
-  -- GitKraken Core
-  -- ===============================
-
-  {
-    "TimUntersberger/neogit",
-    dependencies = { "nvim-lua/plenary.nvim" },
-  },
-
-  {
-    "sindrets/diffview.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-  },
-
-  {
-    "lewis6991/gitsigns.nvim",
-  },
-
-  -- ===============================
-  -- Search / Browsing
-  -- ===============================
-
+  -- Telescope core + dependencies
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-  },
-
-  -- ===============================
-  -- GitHub (PRs / Issues)
-  -- ===============================
-
-  {
-    "pwntester/octo.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
+      -- Native fzf
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
-  },
-
-  -- ===============================
-  -- UI
-  -- ===============================
-
-  {
-    "nvim-lualine/lualine.nvim",
+    config = function()
+      require("plugins.telescope")
+    end,
   },
 }
+

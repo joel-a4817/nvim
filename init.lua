@@ -1,15 +1,18 @@
--- =========================================================
--- Neovim GitKraken Replacement
--- =========================================================
+-- bootstrap lazy.nvim (plugin manager)
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", lazypath
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
-------------------------------------------------------------
--- Leader
-------------------------------------------------------------
+-- Leader key
 vim.g.mapleader = " "
 
-------------------------------------------------------------
--- Basic Options
-------------------------------------------------------------
+-- Core options
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
@@ -19,85 +22,15 @@ vim.opt.tabstop = 2
 vim.opt.signcolumn = "yes"
 
 -- Transparent background
-vim.cmd [[
+vim.cmd([[
   hi Normal guibg=NONE ctermbg=NONE
   hi NormalNC guibg=NONE ctermbg=NONE
   hi NonText guibg=NONE ctermbg=NONE
-]]
+]])
 
-------------------------------------------------------------
--- Bootstrap lazy.nvim
-------------------------------------------------------------
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    lazypath,
-  })
-end
-vim.opt.rtp:prepend(lazypath)
-
-------------------------------------------------------------
--- Plugins
-------------------------------------------------------------
+-- Load plugins via lazy
 require("lazy").setup(require("plugins"))
 
-------------------------------------------------------------
--- Plugin Configurations
-------------------------------------------------------------
-require("configs")
+-- Load keymaps
+require("keymaps")
 
-------------------------------------------------------------
--- Keybinds (GitKraken-style workflow)
-------------------------------------------------------------
-local map = vim.keymap.set
-local opts = { noremap = true, silent = true }
-
--- Neogit
-map("n", "<leader>gs", "<cmd>Neogit<CR>", opts)
-
--- Diffview
-map("n", "<leader>dv", "<cmd>DiffviewOpen<CR>", opts)
-map("n", "<leader>dc", "<cmd>DiffviewClose<CR>", opts)
-map("n", "<leader>dh", "<cmd>DiffviewFileHistory<CR>", opts)
-
--- Gitsigns
-map("n", "]h", "<cmd>Gitsigns next_hunk<CR>", opts)
-map("n", "[h", "<cmd>Gitsigns prev_hunk<CR>", opts)
-map("n", "<leader>hs", "<cmd>Gitsigns stage_hunk<CR>", opts)
-map("n", "<leader>hr", "<cmd>Gitsigns reset_hunk<CR>", opts)
-map("n", "<leader>hp", "<cmd>Gitsigns preview_hunk<CR>", opts)
-map("n", "<leader>hb", "<cmd>Gitsigns blame_line<CR>", opts)
-
--- Telescope (Git browsing & search)
-local builtin = require("telescope.builtin")
-map("n", "<leader>ff", builtin.find_files, opts)
-map("n", "<leader>fg", builtin.live_grep, opts)
-map("n", "<leader>fb", builtin.buffers, opts)
-map("n", "<leader>fh", builtin.help_tags, opts)
-map("n", "<leader>gc", builtin.git_commits, opts)
-map("n", "<leader>gb", builtin.git_branches, opts)
-map("n", "<leader>gsf", builtin.git_status, opts)
-
--- GitHub (Octo)
-map("n", "<leader>gi", "<cmd>Octo issue list<CR>", opts)
-map("n", "<leader>gp", "<cmd>Octo pr list<CR>", opts)
-
-------------------------------------------------------------
--- Auto-make normal files modifiable
-------------------------------------------------------------
-vim.api.nvim_create_autocmd("BufReadPost", {
-  pattern = "*",
-  callback = function()
-    -- Only modifiable if it's a normal file, skip plugin buffers
-    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
-      vim.bo.modifiable = true
-    end
-  end,
-})
-
--- Optional keybind to toggle modifiable manually
-map("n", "<leader>mm", ":set modifiable<CR>", opts)
